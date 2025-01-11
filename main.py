@@ -99,4 +99,4 @@ loop = asyncio.get_event_loop()
 loop.create_task(process_queue())
 
 print("Bot is running...")
-client.run_until_disconnected(
+client.run_until_disconnected()
