@@ -94,9 +94,32 @@ async def delete_last_message(event):
 
     await event.reply("You don't have any messages in the queue.")
 
-# Start the queue processor
-loop = asyncio.get_event_loop()
-loop.create_task(process_queue())
 
-print("Bot is running...")
-client.run_until_disconnected()
+
+import threading
+import asyncio
+from flask import Flask
+
+# Flask app ko initialize karte hain
+app = Flask(__name__)
+
+# Flask route
+@app.route('/')
+def home():
+    return "Bot is running"
+
+# Flask app ko alag thread mein run karne ke liye function
+def run_flask():
+    app.run(host="0.0.0.0", port=8000)
+
+if __name__ == "__main__":
+    # Flask app ko ek alag thread mein start kar rahe hain
+    flask_thread = threading.Thread(target=run_flask)
+    flask_thread.daemon = True  # Ye ensure karega ki jab main program end ho, Flask thread bhi end ho jaye
+    flask_thread.start()
+
+    # Async loop ko create karte hain aur queue processing task ko schedule karte hain
+    loop = asyncio.get_event_loop()
+    loop.create_task(process_queue())  # Async task ko start karte hain    
+    print("Bot is running...")
+    client.run_until_disconnected()
